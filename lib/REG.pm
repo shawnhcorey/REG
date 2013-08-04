@@ -54,7 +54,7 @@ our $VERSION = v0.1.0;
 # Standard modules
 use Carp;
 use English      qw( -no_match_vars );  # Avoids regex performance penalty
-use Scalar::Util qw( blessed reftype );
+use Scalar::Util qw( blessed );
 
 # --------------------------------------
 # Configuration Parameters
@@ -115,12 +115,13 @@ sub join {
   }
 
   for ( @_ ){
-    if( reftype( $_ ) ne 'REGEXP' ){
+    if( ! ref( $_ ) || ref( $_ ) ne 'Regexp' ){
       croak $error_message{not_regexp};
     }
   }
 
-  return bless qr{$reg@_}ms, $class;
+  my $res = CORE::join( q{}, @_ );
+  return bless qr{$reg$res}ms, $class;
 }
 
 # --------------------------------------
@@ -223,12 +224,13 @@ sub none_or_once {
   }
 
   for ( @_ ){
-    if( reftype( $_ ) ne 'REGEXP' ){
+    if( ! ref( $_ ) || ref( $_ ) ne 'Regexp' ){
       croak $error_message{not_regexp};
     }
   }
 
-  return bless qr{$reg(?:@_)?}ms, $class;
+  my $res = CORE::join( q{}, @_ );
+  return bless qr{$reg(?:$res)?}ms, $class;
 }
 
 # --------------------------------------
@@ -247,12 +249,13 @@ sub none_or_most {
   }
 
   for ( @_ ){
-    if( reftype( $_ ) ne 'REGEXP' ){
+    if( ! ref( $_ ) || ref( $_ ) ne 'Regexp' ){
       croak $error_message{not_regexp};
     }
   }
 
-  return bless qr{$reg(?:@_)*}ms, $class;
+  my $res = CORE::join( q{}, @_ );
+  return bless qr{$reg(?:$res)*}ms, $class;
 }
 
 # --------------------------------------
@@ -271,12 +274,13 @@ sub once_or_most {
   }
 
   for ( @_ ){
-    if( reftype( $_ ) ne 'REGEXP' ){
+    if( ! ref( $_ ) || ref( $_ ) ne 'Regexp' ){
       croak $error_message{not_regexp};
     }
   }
 
-  return bless qr{$reg(?:@_)+}ms, $class;
+  my $res = CORE::join( q{}, @_ );
+  return bless qr{$reg(?:$res)+}ms, $class;
 }
 
 # --------------------------------------
@@ -295,12 +299,13 @@ sub none_or_least {
   }
 
   for ( @_ ){
-    if( reftype( $_ ) ne 'REGEXP' ){
+    if( ! ref( $_ ) || ref( $_ ) ne 'Regexp' ){
       croak $error_message{not_regexp};
     }
   }
 
-  return bless qr{$reg(?:@_)*?}ms, $class;
+  my $res = CORE::join( q{}, @_ );
+  return bless qr{$reg(?:$res)*?}ms, $class;
 }
 
 # --------------------------------------
@@ -319,12 +324,13 @@ sub once_or_least {
   }
 
   for ( @_ ){
-    if( reftype( $_ ) ne 'REGEXP' ){
+    if( ! ref( $_ ) || ref( $_ ) ne 'Regexp' ){
       croak $error_message{not_regexp};
     }
   }
 
-  return bless qr{$reg(?:@_)+?}ms, $class;
+  my $res = CORE::join( q{}, @_ );
+  return bless qr{$reg(?:$res)+?}ms, $class;
 }
 
 # --------------------------------------
@@ -350,31 +356,32 @@ sub repeat {
   }
 
   for ( @_ ){
-    if( reftype( $_ ) ne 'REGEXP' ){
+    if( ! ref( $_ ) || ref( $_ ) ne 'Regexp' ){
       croak $error_message{not_regexp};
     }
   }
+  my $res = CORE::join( q{}, @_ );
 
   if( ! defined $max ){
 
     if( $min <= 1 ){
       croak sprintf( $error_message{invalid_repeat_2}, $min, $max );
     }
-    return bless qr[$reg(?:@_){$min,}]ms, $class;
+    return bless qr[$reg(?:$res){$min,}]ms, $class;
 
   }elsif( $max == $min ){
 
     if( $min <= 1 ){
       croak sprintf( $error_message{invalid_repeat_2}, $min, $max );
     }
-    return bless qr[$reg(?:@_){$min}]ms, $class;
+    return bless qr[$reg(?:$res){$min}]ms, $class;
 
   }elsif( $max < $min ){
       croak sprintf( $error_message{invalid_repeat_2}, $min, $max );
 
   }
 
-  return bless qr[$reg(?:@_){$min,$max}]ms, $class;
+  return bless qr[$reg(?:$res){$min,$max}]ms, $class;
 }
 
 # --------------------------------------
@@ -393,12 +400,13 @@ sub capture {
   }
 
   for ( @_ ){
-    if( reftype( $_ ) ne 'REGEXP' ){
+    if( ! ref( $_ ) || ref( $_ ) ne 'Regexp' ){
       croak $error_message{not_regexp};
     }
   }
 
-  return bless qr{$reg(@_)}ms, $class;
+  my $res = CORE::join( q{}, @_ );
+  return bless qr{$reg($res)}ms, $class;
 }
 
 # --------------------------------------
